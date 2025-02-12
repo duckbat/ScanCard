@@ -1,0 +1,33 @@
+## .NET Core
+bin/
+obj/
+*.user
+*.userosscache
+*.sln.docstates
+
+## Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+## Environment Files
+appsettings.Development.json
+appsettings.Production.json
+*.env
+
+## Database
+*.db
+*.db-shm
+*.db-wal
+
+## Logs
+logs/
+*.log
+
+## IDE
+.idea/
+*.swp
+*.swo
+.DS_Store
