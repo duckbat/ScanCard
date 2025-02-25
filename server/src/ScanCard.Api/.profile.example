@@ -1,0 +1,5 @@
+export DB_HOST=localhost
+export DB_NAME=scancard_db
+export DB_USER=scancard_user
+export DB_PASSWORD=password
+export JWT_KEY=efiofioawfioawjfhfaiufhawiufhwafiuahfiuahfuiahfiufwh___wad9wd23
