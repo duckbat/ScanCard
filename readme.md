@@ -103,15 +103,13 @@ dotnet run
 
 ```bash
 # Start development server
-npx expo start
-
-# Start with specific platform
-npx expo start --ios
-npx expo start --android
+npm run dev
 
 # Build
-npx expo build:ios
-npx expo build:android
+npm run build
+
+# Preview
+npm run preview
 ```
 
 ## Testing
