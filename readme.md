@@ -8,7 +8,6 @@ A cross-platform mobile application for managing digital business cards with sea
 
   - Secure login and registration
   - JWT-based authentication
-  - Persistent sessions using Expo SecureStore
 - **Business Card Management**
 
   - Create and manage digital cards
@@ -24,14 +23,12 @@ A cross-platform mobile application for managing digital business cards with sea
 
 ## Tech Stack
 
-### Mobile App (Frontend)
+### React Web-App (Frontend)
 
-- React Native with Expo
+- React.JS
 - TypeScript
-- Tamagui UI Framework
-- Expo Router
-- Expo SecureStore
-- React Query
+- TailwindCSS
+- UI Framework
 - Zustand for state management
 
 ### Backend (API)
@@ -49,7 +46,6 @@ A cross-platform mobile application for managing digital business cards with sea
 - [Node.js](https://nodejs.org/)
 - [.NET SDK 8.0](https://dotnet.microsoft.com/download)
 - [PostgreSQL](https://www.postgresql.org/download/)
-- [Expo CLI](https://docs.expo.dev/get-started/installation/)
 
 ### Development Setup
 
@@ -67,7 +63,7 @@ dotnet run
 # Frontend Setup
 cd ../client
 npm install
-npx expo start
+npm run dev
 ```
 
 ### Environment Variables
