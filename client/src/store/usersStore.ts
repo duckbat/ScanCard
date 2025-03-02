@@ -1,4 +1,4 @@
-import { User, UserResponse } from "@/types/user.types";
+import { User } from "@/types/user.types";
 import axios from "axios";
 import { create } from "zustand";
 
@@ -6,10 +6,10 @@ type UserStore = {
   users: User[];
   loading: boolean;
   error: string | null;
-    fetchUsers: () => Promise<void>;
-    addUser: (user: User) => Promise<void>;
-    updateUser: (id: string, user: User) => Promise<void>;
-    deleteUser: (id: string) => Promise<void>;
+  fetchUsers: () => Promise<void>;
+  addUser: (user: User) => Promise<void>;
+  updateUser: (id: string, user: User) => Promise<void>;
+  deleteUser: (id: string) => Promise<void>;
 };
 
 export const useUsersStore = create<UserStore>((set) => ({
@@ -20,10 +20,12 @@ export const useUsersStore = create<UserStore>((set) => ({
   fetchUsers: async () => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.get<UserResponse>(
-        `${process.env.VITE_API_URL}/api/users`
+      const response = await axios.get<User[]>(
+        `${import.meta.env.VITE_API_URL}/api/users`
       );
-      set({ users: data.data, loading: false });
+      const users = response.data;
+      console.log("Fetched users:", users);
+      set({ users, loading: false });
     } catch (error) {
       set({ error: "Failed to fetch users", loading: false });
       console.log("Error fetching users", error);
@@ -33,12 +35,15 @@ export const useUsersStore = create<UserStore>((set) => ({
   addUser: async (user: User) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.post<{ data: User }>(
-        `${process.env.VITE_API_URL}/api/auth/register`,
+      // Updated to match direct response format
+      const response = await axios.post<User>(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
         user
       );
+      const newUser = response.data;
+      console.log("Added user:", newUser);
       set((state) => ({
-        users: [...state.users, data.data],
+        users: [...state.users, newUser],
         loading: false,
       }));
     } catch (error) {
@@ -50,16 +55,19 @@ export const useUsersStore = create<UserStore>((set) => ({
   updateUser: async (id: string, user: User) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.put<{ data: User }>(
-        `${process.env.VITE_API_URL}/api/users/${id}`,
+      // Updated to match direct response format
+      const response = await axios.put<User>(
+        `${import.meta.env.VITE_API_URL}/api/users/${id}`,
         user
       );
+      const updatedUser = response.data;
+      console.log("Updated user:", updatedUser);
       set((state) => ({
-        users: state.users.map((c) => (c.id === id ? data.data : c)),
+        users: state.users.map((u) => (u.id === id ? updatedUser : u)),
         loading: false,
       }));
     } catch (error) {
-      set({ error: "Failed to upate user", loading: false });
+      set({ error: "Failed to update user", loading: false });
       console.error("Error updating user", error);
     }
   },
@@ -67,10 +75,11 @@ export const useUsersStore = create<UserStore>((set) => ({
   deleteUser: async (id: string) => {
     try {
       set({ loading: true, error: null });
-      await axios.delete(`${process.env.VITE_ENV_URL}/api/users/${id}`);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/users/${id}`);
+      console.log("Deleted user with ID:", id);
       set((state) => ({
-        users: state.users.filter((user) => user.id !== id),
-        loading: true,
+        users: state.users.filter((u) => u.id !== id),
+        loading: false,
       }));
     } catch (error) {
       set({ error: "Failed to delete user", loading: false });

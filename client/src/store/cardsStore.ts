@@ -1,4 +1,4 @@
-import { Card, CardResponse } from "@/types/card.types";
+import { Card } from "@/types/card.types";
 import axios from "axios";
 import { create } from "zustand";
 
@@ -8,7 +8,7 @@ type CardState = {
   error: string | null;
   fetchCards: () => Promise<void>;
   addCard: (card: Card) => Promise<void>;
-  updateCard: (id:string, card: Card) => Promise<void>;
+  updateCard: (id: string, card: Card) => Promise<void>;
   deleteCard: (id: string) => Promise<void>;
 };
 
@@ -17,14 +17,15 @@ export const useCardsStore = create<CardState>((set) => ({
   loading: false,
   error: null,
 
-  // Fetch all cards
   fetchCards: async () => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.get<CardResponse>(
-        `${process.env.VITE_API_URL}/api/businesscards`
+      const response = await axios.get<Card[]>(
+        `${import.meta.env.VITE_API_URL}/api/businesscards`
       );
-      set({ cards: data.data, loading: false });
+      const cards = response.data;
+      console.log("Fetched cards:", cards);
+      set({ cards, loading: false });
     } catch (error) {
       set({ error: "Failed to fetch cards", loading: false });
       console.error("Error fetching cards", error);
@@ -34,11 +35,16 @@ export const useCardsStore = create<CardState>((set) => ({
   addCard: async (card: Card) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.post<{ data: Card }>(
-        `${process.env.VITE_API_URL}/api/businesscards`,
+      const response = await axios.post<Card>(
+        `${import.meta.env.VITE_API_URL}/api/businesscards`,
         card
       );
-      set((state) => ({ cards: [...state.cards, data.data], loading: false }));
+      const newCard = response.data;
+      console.log("Added card:", newCard);
+      set((state) => ({
+        cards: [...state.cards, newCard],
+        loading: false,
+      }));
     } catch (error) {
       set({ error: "Failed to add card", loading: false });
       console.error("Error adding card", error);
@@ -48,12 +54,14 @@ export const useCardsStore = create<CardState>((set) => ({
   updateCard: async (id: string, card: Card) => {
     try {
       set({ loading: true, error: null });
-      const { data } = await axios.put<{ data: Card }>(
-        `${process.env.VITE_API_URL}/api/businesscards/${id}`,
+      const response = await axios.put<Card>(
+        `${import.meta.env.VITE_API_URL}/api/businesscards/${id}`,
         card
       );
+      const updatedCard = response.data;
+      console.log("Updated card:", updatedCard);
       set((state) => ({
-        cards: state.cards.map((c) => (c.id === id ? data.data : c)),
+        cards: state.cards.map((c) => (c.id === id ? updatedCard : c)),
         loading: false,
       }));
     } catch (error) {
@@ -62,13 +70,13 @@ export const useCardsStore = create<CardState>((set) => ({
     }
   },
 
-  // Delete a card
   deleteCard: async (id: string) => {
     try {
       set({ loading: true, error: null });
-      await axios.delete<{ data: Card }>(
-        `${process.env.VITE_API_URL}/api/businesscards/${id}`
+      await axios.delete(
+        `${import.meta.env.VITE_API_URL}/api/businesscards/${id}`
       );
+      console.log("Deleted card with ID:", id);
       set((state) => ({
         cards: state.cards.filter((c) => c.id !== id),
         loading: false,
@@ -77,5 +85,5 @@ export const useCardsStore = create<CardState>((set) => ({
       set({ error: "Failed to delete card", loading: false });
       console.error("Error deleting card", error);
     }
-  }
+  },
 }));

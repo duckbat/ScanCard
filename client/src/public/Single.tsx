@@ -1,0 +1,1 @@
+// TODO: Create a Single Card Page with QR Code and Export functions
