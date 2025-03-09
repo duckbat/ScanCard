@@ -5,7 +5,7 @@ export interface User {
     username: string;
     email: string;
     password: string;
-    created_at: Date;
+    created_at: Date | string;
 }
 
 export interface UserForm {

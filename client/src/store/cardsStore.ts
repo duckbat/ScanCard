@@ -2,6 +2,9 @@ import { Card } from "@/types/card.types";
 import axios from "axios";
 import { create } from "zustand";
 
+// Ensure API URL is set or provide a fallback
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 type CardState = {
   cards: Card[];
   loading: boolean;
@@ -20,10 +23,23 @@ export const useCardsStore = create<CardState>((set) => ({
   fetchCards: async () => {
     try {
       set({ loading: true, error: null });
-      const response = await axios.get<Card[]>(
-        `${import.meta.env.VITE_API_URL}/api/businesscards`
+      console.log("Fetching cards from:", `${API_URL}/api/businesscards`);
+      const response = await axios.get<Card[] | { data: Card[] }>(
+        `${API_URL}/api/businesscards`
       );
-      const cards = response.data;
+      
+      // Handle both array and object with data property
+      let cards = Array.isArray(response.data) 
+        ? response.data 
+        : (response.data as { data: Card[] }).data || [];
+      
+      // Ensure dates are properly formatted
+      cards = cards.map(card => ({
+        ...card,
+        created_at: card.created_at || new Date().toISOString(),
+        updated_at: card.updated_at || new Date().toISOString()
+      }));
+      
       console.log("Fetched cards:", cards);
       set({ cards, loading: false });
     } catch (error) {
@@ -35,11 +51,24 @@ export const useCardsStore = create<CardState>((set) => ({
   addCard: async (card: Card) => {
     try {
       set({ loading: true, error: null });
-      const response = await axios.post<Card>(
-        `${import.meta.env.VITE_API_URL}/api/businesscards`,
-        card
+      
+      // Ensure dates are properly formatted
+      const cardWithFormattedDates = {
+        ...card,
+        created_at: card.created_at || new Date().toISOString(),
+        updated_at: card.updated_at || new Date().toISOString()
+      };
+      
+      const response = await axios.post<Card | { data: Card }>(
+        `${API_URL}/api/businesscards`,
+        cardWithFormattedDates
       );
-      const newCard = response.data;
+      
+      // Handle both direct object and object with data property
+      const newCard = 'data' in response.data 
+        ? (response.data as { data: Card }).data 
+        : response.data;
+      
       console.log("Added card:", newCard);
       set((state) => ({
         cards: [...state.cards, newCard],
@@ -54,11 +83,24 @@ export const useCardsStore = create<CardState>((set) => ({
   updateCard: async (id: string, card: Card) => {
     try {
       set({ loading: true, error: null });
-      const response = await axios.put<Card>(
-        `${import.meta.env.VITE_API_URL}/api/businesscards/${id}`,
-        card
+      
+      // Ensure dates are properly formatted
+      const cardWithFormattedDates = {
+        ...card,
+        created_at: card.created_at || new Date().toISOString(),
+        updated_at: card.updated_at || new Date().toISOString()
+      };
+      
+      const response = await axios.put<Card | { data: Card }>(
+        `${API_URL}/api/businesscards/${id}`,
+        cardWithFormattedDates
       );
-      const updatedCard = response.data;
+      
+      // Handle both direct object and object with data property
+      const updatedCard = 'data' in response.data 
+        ? (response.data as { data: Card }).data 
+        : response.data;
+      
       console.log("Updated card:", updatedCard);
       set((state) => ({
         cards: state.cards.map((c) => (c.id === id ? updatedCard : c)),
@@ -74,7 +116,7 @@ export const useCardsStore = create<CardState>((set) => ({
     try {
       set({ loading: true, error: null });
       await axios.delete(
-        `${import.meta.env.VITE_API_URL}/api/businesscards/${id}`
+        `${API_URL}/api/businesscards/${id}`
       );
       console.log("Deleted card with ID:", id);
       set((state) => ({

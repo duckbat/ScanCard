@@ -1,9 +1,10 @@
 // TODO: Create Real Card Component
 import { useUsersStore } from '@/store/usersStore';
+import { CardListProps } from '@/types/card.types';
 import { useEffect } from 'react';
 
 
-export const Test = () => {
+export const Card: React.FC<CardListProps> = () => {
   const { users, loading, error, fetchUsers } = useUsersStore();
 
   useEffect(() => {
